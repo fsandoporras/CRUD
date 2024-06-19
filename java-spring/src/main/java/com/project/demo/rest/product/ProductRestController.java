@@ -20,7 +20,8 @@ public class ProductRestController {
         return productRepository.findAll();
     }
 
-    @PostMapping
+    @PostMapping //AGREGAR NUEVO PRODUCTO ACCESSIBLE SOLO AL ADMIN
+    @PreAuthorize("hasAnyRole('ADMIN', 'SUPER_ADMIN')")
     public Product addProduct(@RequestBody Product product) {
         return productRepository.save(product);
     }
@@ -31,17 +32,19 @@ public class ProductRestController {
                 .orElseThrow(() -> new RuntimeException("Product not found with id: " + id));
     }
 
-    @GetMapping("/searchByName/{name}")
+   /* @GetMapping("/searchByName/{name}")
     public List<Product> getProductsByName(@PathVariable String name) {
         return productRepository.findProductsByNameContaining(name);
     }
+      -----------------             NO IMPLEMENTADOS ESTA TAREA         -------------------
 
     @GetMapping("/searchByCategory/{categoryId}")
     public List<Product> getProductsByCategory(@PathVariable Long categoryId) {
         return productRepository.findProductsByCategoryId(categoryId);
-    }
+    }*/
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'SUPER_ADMIN')")
     public Product updateProduct(@PathVariable Long id, @RequestBody Product product) {
         return productRepository.findById(id)
                 .map(existingProduct -> {
@@ -59,6 +62,7 @@ public class ProductRestController {
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'SUPER_ADMIN')")
     public void deleteProduct(@PathVariable Long id) {
         productRepository.deleteById(id);
     }
