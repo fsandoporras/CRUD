@@ -13,7 +13,6 @@ import java.util.Optional;
 public class AdminSeeder implements ApplicationListener<ContextRefreshedEvent> {
     private final RoleRepository roleRepository;
     private final UserRepository userRepository;
-
     private final PasswordEncoder passwordEncoder;
 
 
@@ -30,6 +29,7 @@ public class AdminSeeder implements ApplicationListener<ContextRefreshedEvent> {
     @Override
     public void onApplicationEvent(ContextRefreshedEvent contextRefreshedEvent) {
         this.createSuperAdministrator();
+        this.createRegularUser();
     }
 
     private void createSuperAdministrator() {
@@ -54,5 +54,25 @@ public class AdminSeeder implements ApplicationListener<ContextRefreshedEvent> {
         user.setRole(optionalRole.get());
 
         userRepository.save(user);
+    }
+
+    private void createRegularUser() {
+        User userRegular = new User();
+
+        userRegular.setName("Regular");
+        userRegular.setLastname("User");
+        userRegular.setEmail("user@gmail.com");
+        userRegular.setPassword(passwordEncoder.encode("user123"));
+
+        Optional<Role> optionalRole = roleRepository.findByName(RoleEnum.USER);
+        Optional<User> optionalUser = userRepository.findByEmail(userRegular.getEmail());
+
+        if (optionalRole.isEmpty() || optionalUser.isPresent()) {
+            return;
+        }
+
+        userRegular.setRole(optionalRole.get());
+
+        userRepository.save(userRegular);
     }
 }
